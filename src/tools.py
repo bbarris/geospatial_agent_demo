@@ -12,6 +12,7 @@ Dependencies:
   geopandas
   shapely
   xarray, numpy
+  rasterio
 """
 
 from datetime import datetime, timedelta
@@ -25,6 +26,8 @@ from shapely.geometry import box, mapping
 
 from pystac_client import Client
 import planetary_computer as pc
+
+import rasterio
 
 # ---------------------------------------------------------------------
 # STAC setup
@@ -149,3 +152,30 @@ def compute_ndvi_for_item(
         "min": float(ndvi.min().values),
         "max": float(ndvi.max().values)
     }
+
+def load_sentinel_image(path: str) -> dict:
+    """Load Sentinel image and return red + nir bands and metadata."""
+    with rasterio.open(path) as src:
+        arr = src.read()
+        profile = src.profile.copy()
+
+    # Typical Sentinel-2: B04 = red, B08 = nir
+    # But a true dataset will vary based on product.
+    # For simplicity, assume band 1 = red, band 2 = nir.
+    red = arr[0].astype(np.float32)
+    nir = arr[1].astype(np.float32)
+
+    return {"red": red, "nir": nir, "profile": profile}
+    
+
+def compute_ndvi(red, nir):
+    """Compute NDVI = (NIR - RED) / (NIR + RED)."""
+    numerator = nir - red
+    denominator = nir + red
+    ndvi = numerator / np.where(denominator == 0, np.nan, denominator)
+    return ndvi
+
+
+def calc_mean_ndvi(ndvi):
+    """Mean NDVI, ignoring nan."""
+    return float(np.nanmean(ndvi))
