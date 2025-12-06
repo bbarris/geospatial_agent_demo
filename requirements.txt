@@ -1,0 +1,16 @@
+pystac-client>=0.9
+planetary-computer>=1.0
+pystac>=1.0
+rasterio
+rioxarray
+xarray
+numpy
+matplotlib
+geopandas
+shapely
+folium
+pillow
+langchain
+openai
+tqdm
+jupyterlab
