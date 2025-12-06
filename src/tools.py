@@ -179,3 +179,14 @@ def compute_ndvi(red, nir):
 def calc_mean_ndvi(ndvi):
     """Mean NDVI, ignoring nan."""
     return float(np.nanmean(ndvi))
+
+# ----------------------------
+# Registry (for agent)
+# ----------------------------
+
+TOOLS = {
+    "load_sentinel": load_sentinel_image,
+    "compute_ndvi": compute_ndvi,
+    "mean_ndvi": calc_mean_ndvi,
+    # ... other tools you defined earlier
+}
